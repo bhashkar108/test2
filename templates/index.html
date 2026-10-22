@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ app_name }} | Complete AI Student Platform</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Math.js for mathematical evaluation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js"></script>
+  <!-- Chart.js for student progress -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div class="brand-title">
+          <span class="brand-name">TECH AI</span>
+          <span class="brand-tag">SMART WAY</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-item active" data-tab="tab-teacher">
+          <i data-lucide="graduation-cap"></i>
+          <span>AI Teacher</span>
+          <span class="nav-badge">Voice</span>
+        </div>
+        <div class="nav-item" data-tab="tab-forms">
+          <i data-lucide="file-check-2"></i>
+          <span>Auto Form Filler</span>
+        </div>
+        <div class="nav-item" data-tab="tab-documents">
+          <i data-lucide="file-text"></i>
+          <span>Smart Documents</span>
+        </div>
+        <div class="nav-item" data-tab="tab-quiz">
+          <i data-lucide="help-circle"></i>
+          <span>Auto Quiz</span>
+        </div>
+        <div class="nav-item" data-tab="tab-graph">
+          <i data-lucide="line-chart"></i>
+          <span>Equation Graph</span>
+        </div>
+        <div class="nav-item" data-tab="tab-progress">
+          <i data-lucide="bar-chart-2"></i>
+          <span>Progress</span>
+        </div>
+        <div class="nav-item" data-tab="tab-profile">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet" id="sidebarUserSnippet">
+          <div class="user-avatar" id="userAvatarLetter">A</div>
+          <div class="user-meta">
+            <span class="name" id="userNameLabel">Aarav Sharma</span>
+            <span class="role" id="userRoleLabel">Student • NIT</span>
+          </div>
+        </div>
+        <button class="ctrl-btn" id="logoutBtn" style="width: 100%; justify-content: center;">
+          <i data-lucide="log-out"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top App Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="icon-btn mobile-only" id="mobileMenuToggle" style="display: none;">
+            <i data-lucide="menu"></i>
+          </button>
+          <h1 class="page-title" id="pageTitleHeading">AI Teacher & Notesbook</h1>
+        </div>
+
+        <div class="header-right">
+          <!-- Language Selector -->
+          <div class="lang-selector">
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn active" data-lang="hinglish">Hinglish</button>
+            <button class="lang-btn" data-lang="hi">हिंदी</button>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+            <i data-lucide="sun" id="themeIcon"></i>
+          </button>
+
+          <!-- Voice Status Pill -->
+          <button class="ctrl-btn mic-btn" id="voiceCommandToggle" title="Voice Commands (Stop, Repeat, Continue, Ruko)">
+            <i data-lucide="mic"></i>
+            <span id="voiceMicStatus">Voice Cmds</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body Panes -->
+      <div class="content-body">
+        
+        <!-- ================= TAB 1: AI TEACHER & SMART NOTESBOOK ================= -->
+        <section class="tab-pane active" id="tab-teacher">
+          <div class="teacher-workspace">
+            
+            <!-- Left Panel: Study Material Source & Controls -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="book-open" style="color: var(--accent-cyan);"></i>
+                  <span>Study Material Input</span>
+                </div>
+                <p class="card-desc">Upload a PDF or paste notes. Select any text to have your personal AI teacher explain it step by step with voice.</p>
+
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+                  <label class="ctrl-btn" style="flex: 1; justify-content: center; cursor: pointer;">
+                    <i data-lucide="upload-cloud"></i>
+                    <span>Upload PDF / Text</span>
+                    <input type="file" id="teacherDocUpload" accept=".pdf,.txt" style="display: none;">
+                  </label>
+                  <button class="ctrl-btn" id="loadSampleStudyBtn">
+                    <i data-lucide="file-code"></i>
+                    <span>Sample Topic</span>
+                  </button>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Study Material & Selectable Content:</label>
+                  <textarea class="input-field" id="teacherStudyText" rows="7" placeholder="Type or paste your lecture notes, textbook paragraph, or syllabus topic here..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Pacing:</span>
+                    <select id="teacherDifficulty" class="input-field" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.82rem;">
+                      <option value="easy">Easy (Beginner)</option>
+                      <option value="medium" selected>Standard (Teacher)</option>
+                      <option value="advanced">Deep (Detailed)</option>
+                    </select>
+                  </div>
+
+                  <button class="ctrl-btn primary" id="startLearningBtn">
+                    <i data-lucide="play-circle"></i>
+                    <span>Start Learning</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Notesbook Quick Panel -->
+              <div class="smart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <div class="card-title" style="margin: 0;">
+                    <i data-lucide="bookmark" style="color: var(--accent-indigo);"></i>
+                    <span>Smart Notesbook</span>
+                  </div>
+                  <button class="ctrl-btn" id="saveCurrentNoteBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                    <i data-lucide="save"></i> Save Lesson Note
+                  </button>
+                </div>
+                <div id="notesbookList" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 250px; overflow-y: auto;">
+                  <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">
+                    No notes saved yet. Click "Save Lesson Note" to persist your key takeaways!
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Panel: Interactive AI Teacher Experience -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <!-- Voice Orb & Audio Wave Visualizer Card -->
+              <div class="smart-card">
+                <div class="orb-container">
+                  <!-- Animated Orb -->
+                  <div class="voice-orb" id="teacherVoiceOrb"></div>
+                  
+                  <!-- Responsive Audio Wave -->
+                  <div class="audio-waves" id="audioWaveVisualizer">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                  </div>
+
+                  <div style="margin-top: 1rem; text-align: center;">
+                    <h3 id="lessonTitleDisplay" style="font-size: 1.15rem; font-weight: 700;">Ready to Teach</h3>
+                    <p id="lessonStatusDisplay" style="font-size: 0.82rem; color: var(--accent-cyan); margin-top: 0.2rem;">Click "Start Learning" to listen & read along</p>
+                  </div>
+
+                  <!-- Speech Playback Controls -->
+                  <div class="speech-controls">
+                    <button class="ctrl-btn" id="speechPrevBtn" title="Previous Sentence">
+                      <i data-lucide="skip-back"></i>
+                    </button>
+                    <button class="ctrl-btn primary" id="speechPlayPauseBtn" title="Play / Pause">
+                      <i data-lucide="play" id="playPauseIcon"></i>
+                      <span id="playPauseLabel">Play</span>
+                    </button>
+                    <button class="ctrl-btn" id="speechRepeatBtn" title="Repeat Current Sentence">
+                      <i data-lucide="rotate-ccw"></i> Repeat
+                    </button>
+                    <button class="ctrl-btn" id="speechNextBtn" title="Next Sentence">
+                      <i data-lucide="skip-forward"></i>
+                    </button>
+                    <button class="ctrl-btn" id="speechStopBtn" title="Stop">
+                      <i data-lucide="square"></i>
+                    </button>
+                    
+                    <!-- Speed Selector -->
+                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem;">
+                      <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Speed:</span>
+                      <select id="speechRateSelect" class="input-field" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                        <option value="0.75">0.75x</option>
+                        <option value="1.0" selected>1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Karaoke Word & Sentence Highlighting Box -->
+                <div class="input-label" style="display: flex; justify-content: space-between;">
+                  <span>Karaoke Live Reading (Auto-scrolled with Speech):</span>
+                  <span id="readingProgressLabel" style="color: var(--accent-cyan);">0%</span>
+                </div>
+                <div class="karaoke-box" id="karaokeContainer">
+                  <span style="color: var(--text-muted);">AI Teacher explanation will appear here with synchronized word and sentence tracking...</span>
+                </div>
+              </div>
+
+              <!-- Step-by-Step Breakdown & Difficult Word Chunks -->
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="layers" style="color: var(--accent-cyan);"></i>
+                  <span>Step-by-Step Teacher Explanation</span>
+                </div>
+                
+                <div id="stepsContainer" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem;">
+                  <div style="color: var(--text-muted); font-size: 0.85rem;">Steps will appear when you begin a lesson.</div>
+                </div>
+
+                <!-- Difficult Words & 1-3 Word Chunks -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                  <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.5rem;">
+                    <i data-lucide="help-circle" style="color: var(--accent-amber); width: 18px; height: 18px;"></i>
+                    <span>Difficult Words & 1–3 Word Breakdown</span>
+                  </div>
+                  <div id="difficultWordsTags" style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">Challenging vocabulary will be automatically extracted and pronounced here.</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 2: SMART AUTO FORM FILLER ================= -->
+        <section class="tab-pane" id="tab-forms">
+          <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.75rem;">
+            
+            <!-- Left: Form Analysis & Requirements Checklist -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="file-check-2" style="color: var(--accent-cyan);"></i>
+                  <span>Smart Form Requirements Engine</span>
+                </div>
+                <p class="card-desc">We analyze instructions and rules BEFORE asking for your details. Upload an admission, scholarship, EWS or exam form PDF/image.</p>
+
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+                  <label class="ctrl-btn primary" style="flex: 1; justify-content: center; cursor: pointer;">
+                    <i data-lucide="upload"></i>
+                    <span>Upload Form Document</span>
+                    <input type="file" id="formDocUpload" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+                  </label>
+                  <button class="ctrl-btn" id="loadSampleScholarshipBtn">
+                    <i data-lucide="sparkles"></i>
+                    <span>Demo Scholarship</span>
+                  </button>
+                </div>
+
+                <div class="input-group">
+                  <label class="input-label">Or paste Form URL / Notice Text:</label>
+                  <input type="text" id="formUrlInput" class="input-field" placeholder="e.g. https://scholarships.gov.in/fresh-application or paste circular">
+                </div>
+
+                <button class="ctrl-btn" id="analyzeFormBtn" style="width: 100%; justify-content: center;">
+                  <i data-lucide="scan-text"></i>
+                  <span>Analyze Rules & Compare with My Profile</span>
+                </button>
+              </div>
+
+              <!-- Requirements Checklist (Prominently shown on mobile) -->
+              <div class="smart-card" id="formChecklistCard">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <div class="card-title" style="margin: 0;">
+                    <i data-lucide="list-checks" style="color: var(--accent-emerald);"></i>
+                    <span>Requirements Cross-Check</span>
+                  </div>
+                  <span class="nav-badge" id="completionBadge">0% Ready</span>
+                </div>
+
+                <div class="checklist-container" id="formChecklistItems">
+                  <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">
+                    Upload a form to inspect required fields, eligibility criteria, and document specs.
+                  </div>
+                </div>
+
+                <!-- Document Specification Guidelines -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
+                  <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.5rem;">Document Specifications Detected:</h4>
+                  <div id="docSpecsList" style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                    <div>• Passport Photo: JPG &lt; 50 KB (Portrait)</div>
+                    <div>• Signature: JPG &lt; 20 KB (Landscape)</div>
+                    <div>• Previous Marksheet: PDF &lt; 200 KB</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right: Live Form Auto-Fill Preview & Document Prepper -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <!-- Live Form Preview -->
+              <div class="smart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div class="card-title" style="margin: 0;">
+                    <i data-lucide="eye" style="color: var(--accent-blue);"></i>
+                    <span>Live Form Preview</span>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="ctrl-btn" id="printFormBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                      <i data-lucide="printer"></i> Print / PDF
+                    </button>
+                    <button class="ctrl-btn primary" id="confirmSubmitFormBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                      <i data-lucide="check-circle"></i> Confirm Details
+                    </button>
+                  </div>
+                </div>
+                <p class="card-desc">Review your mapped profile data before submission. You can click any field to edit directly.</p>
+
+                <div class="form-preview-sheet" id="liveFormPreviewSheet">
+                  <div class="form-preview-header">
+                    <h2 style="font-size: 1.15rem; color: #0284c7; font-weight: 800;" id="previewFormName">STUDENT APPLICATION FORM</h2>
+                    <p style="font-size: 0.75rem; color: #64748b;">TECH AI Verified Application Summary</p>
+                  </div>
+
+                  <div class="form-preview-grid" id="previewFieldsGrid">
+                    <!-- Mapped fields rendered dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Document Prepper Mini-Tool -->
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="sliders" style="color: var(--accent-indigo);"></i>
+                  <span>Document Quick Prepper</span>
+                </div>
+                <p class="card-desc">Ensure your photos and documents meet file size and orientation rules.</p>
+                
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                  <button class="ctrl-btn" id="quickRotateBtn"><i data-lucide="rotate-cw"></i> Rotate 90°</button>
+                  <button class="ctrl-btn" id="quickCompressBtn"><i data-lucide="minimize-2"></i> Compress to &lt; 50KB</button>
+                  <button class="ctrl-btn" id="quickPdfConvertBtn"><i data-lucide="file-text"></i> Convert to PDF</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 3: SMART DOCUMENT PROCESSOR ================= -->
+        <section class="tab-pane" id="tab-documents">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem;">
+            
+            <!-- Left: Document Upload & Camera Capture Workspace -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="scan" style="color: var(--accent-cyan);"></i>
+                  <span>Document Capture & Upload</span>
+                </div>
+                <p class="card-desc">Upload documents or capture using device camera. Process, rotate, crop, compress, and preserve original files.</p>
+
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+                  <label class="ctrl-btn primary" style="flex: 1; justify-content: center; cursor: pointer;">
+                    <i data-lucide="upload-cloud"></i>
+                    <span>Choose File</span>
+                    <input type="file" id="studioDocUpload" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display: none;">
+                  </label>
+                  <button class="ctrl-btn" id="openCameraCaptureBtn">
+                    <i data-lucide="camera"></i>
+                    <span>Use Camera</span>
+                  </button>
+                </div>
+
+                <!-- Canvas Preview Area -->
+                <div class="doc-canvas-wrapper" id="canvasWrapper">
+                  <canvas id="documentCanvas"></canvas>
+                  <div id="canvasEmptyPlaceholder" style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">
+                    <i data-lucide="image" style="width: 48px; height: 48px; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                    <p>No document loaded yet</p>
+                  </div>
+                </div>
+
+                <!-- Transformation Tools Toolbar -->
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+                  <button class="ctrl-btn" id="canvasRotateLeftBtn" title="Rotate Counter-Clockwise"><i data-lucide="rotate-ccw"></i> -90°</button>
+                  <button class="ctrl-btn" id="canvasRotateRightBtn" title="Rotate Clockwise"><i data-lucide="rotate-cw"></i> +90°</button>
+                  <button class="ctrl-btn" id="canvasGrayscaleBtn" title="Black & White High Contrast"><i data-lucide="contrast"></i> B&W</button>
+                  <button class="ctrl-btn" id="canvasResetBtn" title="Reset Image"><i data-lucide="refresh-cw"></i> Reset</button>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.35rem;">
+                    <span>Quality Compression:</span>
+                    <span id="compressionValueLabel" style="color: var(--accent-cyan); font-weight: 700;">85%</span>
+                  </div>
+                  <input type="range" id="compressionRange" min="10" max="100" value="85" style="width: 100%;">
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                  <button class="ctrl-btn primary" id="downloadProcessedBtn" style="flex: 1; justify-content: center;">
+                    <i data-lucide="download"></i> Download Processed File
+                  </button>
+                  <button class="ctrl-btn" id="exportPdfBtn">
+                    <i data-lucide="file-text"></i> Export as PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Mathematical Document Recognition & Equations -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="variable" style="color: var(--accent-indigo);"></i>
+                  <span>Mathematical Document Recognition</span>
+                </div>
+                <p class="card-desc">Recognize equations from readable text or images, verify extracted formula, calculate roots, and send directly to Equation Grapher.</p>
+
+                <div class="input-group">
+                  <label class="input-label">Extracted or Typed Mathematical Equation:</label>
+                  <input type="text" id="mathDocInput" class="input-field" value="x^2 - 5x + 6 = 0" placeholder="e.g. 2x^2 + 7x - 4 = 0">
+                </div>
+
+                <div style="display: flex; gap: 0.75rem;">
+                  <button class="ctrl-btn primary" id="solveMathDocBtn">
+                    <i data-lucide="calculator"></i>
+                    <span>Calculate Roots & Steps</span>
+                  </button>
+                  <button class="ctrl-btn" id="plotMathDocBtn">
+                    <i data-lucide="line-chart"></i>
+                    <span>Plot on Graph</span>
+                  </button>
+                </div>
+
+                <!-- Math Solution Result Box -->
+                <div style="margin-top: 1.25rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+                  <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.5rem;" id="mathEquationStandard">Standard Form: x² - 5x + 6 = 0</div>
+                  <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;" id="mathRootsOutput">Roots: x₁ = 2.00, x₂ = 3.00</div>
+                  
+                  <div class="input-label">Step-by-Step Derivation:</div>
+                  <div id="mathStepsList" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-secondary); max-height: 180px; overflow-y: auto;">
+                    <div>1. Identify coefficients: a = 1, b = -5, c = 6</div>
+                    <div>2. Calculate discriminant D = (-5)² - 4(1)(6) = 1</div>
+                    <div>3. Since D &gt; 0, two real distinct roots exist.</div>
+                    <div>4. x = (5 ± 1) / 2 =&gt; x = 3, x = 2</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Processed Documents History -->
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="archive" style="color: var(--accent-cyan);"></i>
+                  <span>Saved Documents Workspace</span>
+                </div>
+                <div id="docsWorkspaceList" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 220px; overflow-y: auto;">
+                  <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem 0;">
+                    Your uploaded and prepared documents will be listed here.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 4: AUTO QUIZ ================= -->
+        <section class="tab-pane" id="tab-quiz">
+          <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <div class="smart-card">
+              <div class="card-title">
+                <i data-lucide="help-circle" style="color: var(--accent-cyan);"></i>
+                <span>AI Auto Quiz Generator</span>
+              </div>
+              <p class="card-desc">Generate instant practice quizzes based on your study notes or any textbook chapter to test conceptual clarity.</p>
+
+              <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+                <input type="text" id="quizTopicInput" class="input-field" placeholder="Enter topic e.g. Newton's Laws, Photosynthesis, Quadratic Equations">
+                <button class="ctrl-btn primary" id="generateQuizBtn" style="white-space: nowrap;">
+                  <i data-lucide="sparkles"></i> Generate Quiz
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz Play Area -->
+            <div class="smart-card" id="quizPlayCard" style="display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                <div>
+                  <span id="quizCounterLabel" style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700;">Question 1 of 5</span>
+                  <h3 id="quizQuestionText" style="font-size: 1.15rem; margin-top: 0.35rem;">Sample Question Text?</h3>
+                </div>
+                <div style="text-align: right;">
+                  <span id="quizScoreLabel" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald);">Score: 0</span>
+                </div>
+              </div>
+
+              <!-- Options -->
+              <div id="quizOptionsContainer" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <!-- Feedback / Explanation Box -->
+              <div id="quizExplanationBox" style="display: none; background: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--accent-cyan); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.9rem;">
+                <p id="quizExplanationText">Explanation details...</p>
+              </div>
+
+              <div style="display: flex; justify-content: space-between;">
+                <button class="ctrl-btn" id="quizHintBtn"><i data-lucide="lightbulb"></i> Need Hint?</button>
+                <button class="ctrl-btn primary" id="quizNextBtn" style="display: none;">Next Question <i data-lucide="arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- Quiz Results Report Card -->
+            <div class="smart-card" id="quizResultCard" style="display: none; text-align: center; padding: 2.5rem 1.5rem;">
+              <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                <i data-lucide="award" style="width: 44px; height: 44px;"></i>
+              </div>
+              <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;" id="quizFinalTitle">Great Job!</h2>
+              <p style="font-size: 1.1rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 1.5rem;" id="quizFinalScore">You scored 4 out of 5 (80%)</p>
+              
+              <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="ctrl-btn primary" id="retakeQuizBtn"><i data-lucide="rotate-ccw"></i> Retake Quiz</button>
+                <button class="ctrl-btn" id="reviewAnswersBtn"><i data-lucide="file-text"></i> Save to Progress</button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 5: EQUATION GRAPH & MATH STUDIO ================= -->
+        <section class="tab-pane" id="tab-graph">
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.75rem;">
+            
+            <!-- Left: Interactive Canvas Graph -->
+            <div class="smart-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="card-title" style="margin: 0;">
+                  <i data-lucide="line-chart" style="color: var(--accent-cyan);"></i>
+                  <span>2D Mathematical Function Grapher</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="ctrl-btn" id="graphZoomInBtn"><i data-lucide="zoom-in"></i></button>
+                  <button class="ctrl-btn" id="graphZoomOutBtn"><i data-lucide="zoom-out"></i></button>
+                  <button class="ctrl-btn" id="graphResetViewBtn"><i data-lucide="maximize-2"></i></button>
+                </div>
+              </div>
+
+              <div class="graph-container">
+                <canvas id="equationGraphCanvas"></canvas>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted);">
+                <span>Move mouse over graph to trace (x, y) coordinates</span>
+                <span id="graphCoordsBadge" style="font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan);">x: 0.00, y: 0.00</span>
+              </div>
+            </div>
+
+            <!-- Right: Function Controls & Quadratic Solver -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="sliders" style="color: var(--accent-cyan);"></i>
+                  <span>Function Plotter</span>
+                </div>
+                
+                <div class="input-group">
+                  <label class="input-label">f(x) Expression (Supports math.js syntax):</label>
+                  <input type="text" id="graphFuncInput" class="input-field" value="x^2 - 4*x + 3" placeholder="e.g. x^2 - 4, sin(x), 2*x + 1">
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                  <button class="ctrl-btn" data-preset="x^2 - 4">x² - 4</button>
+                  <button class="ctrl-btn" data-preset="sin(x)">sin(x)</button>
+                  <button class="ctrl-btn" data-preset="cos(x)">cos(x)</button>
+                  <button class="ctrl-btn" data-preset="x^3 - 3*x">x³ - 3x</button>
+                </div>
+
+                <button class="ctrl-btn primary" id="plotGraphBtn" style="width: 100%; justify-content: center;">
+                  <i data-lucide="play"></i> Plot Function
+                </button>
+              </div>
+
+              <!-- Quadratic Solver Card -->
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="divide" style="color: var(--accent-indigo);"></i>
+                  <span>Quadratic Formula Calculator</span>
+                </div>
+                <p class="card-desc">Solve ax² + bx + c = 0 and locate parabola vertex, roots, and discriminant.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                  <div>
+                    <label class="input-label">a:</label>
+                    <input type="number" id="quadA" class="input-field" value="1">
+                  </div>
+                  <div>
+                    <label class="input-label">b:</label>
+                    <input type="number" id="quadB" class="input-field" value="-4">
+                  </div>
+                  <div>
+                    <label class="input-label">c:</label>
+                    <input type="number" id="quadC" class="input-field" value="3">
+                  </div>
+                </div>
+
+                <button class="ctrl-btn" id="solveQuadraticBtn" style="width: 100%; justify-content: center; margin-bottom: 1rem;">
+                  <i data-lucide="calculator"></i> Calculate & Graph
+                </button>
+
+                <div id="quadResultsBox" style="font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); background: var(--bg-secondary); padding: 0.75rem; border-radius: var(--radius-sm);">
+                  <div>• Roots: x₁ = 3.00, x₂ = 1.00</div>
+                  <div>• Vertex: (2.00, -1.00)</div>
+                  <div>• Discriminant D: 4.00 (Real & distinct)</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 6: PROGRESS & ANALYTICS ================= -->
+        <section class="tab-pane" id="tab-progress">
+          <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+            
+            <!-- Quick Stats Bar -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <div class="smart-card" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="flame" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 1.5rem; font-weight: 800;" id="statStreakDays">7 Days</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">STUDY STREAK</div>
+                </div>
+              </div>
+
+              <div class="smart-card" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="clock" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 1.5rem; font-weight: 800;" id="statHoursLearned">14.5 hrs</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">LEARNING TIME</div>
+                </div>
+              </div>
+
+              <div class="smart-card" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="award" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 1.5rem; font-weight: 800;" id="statQuizAccuracy">88%</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">QUIZ ACCURACY</div>
+                </div>
+              </div>
+
+              <div class="smart-card" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="file-check-2" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 1.5rem; font-weight: 800;" id="statFormsDone">3</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">FORMS PREPARED</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="trending-up" style="color: var(--accent-cyan);"></i>
+                  <span>Weekly Study Activity (Minutes per Day)</span>
+                </div>
+                <div style="height: 260px; position: relative;">
+                  <canvas id="progressActivityChart"></canvas>
+                </div>
+              </div>
+
+              <div class="smart-card">
+                <div class="card-title">
+                  <i data-lucide="history" style="color: var(--accent-indigo);"></i>
+                  <span>Recent Learning Sessions</span>
+                </div>
+                <div id="progressSessionsList" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 260px; overflow-y: auto;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ================= TAB 7: PROFILE & SETTINGS ================= -->
+        <section class="tab-pane" id="tab-profile">
+          <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <div class="smart-card">
+              <div class="card-title">
+                <i data-lucide="user-check" style="color: var(--accent-cyan);"></i>
+                <span>Student Master Profile (Auto Form Filler Data Source)</span>
+              </div>
+              <p class="card-desc">Save your verified academic and personal records once. TECH AI uses this information to automatically fill college, scholarship, and examination forms without repeating yourself.</p>
+
+              <form id="studentProfileForm">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                  <div class="input-group">
+                    <label class="input-label">Student Full Name:</label>
+                    <input type="text" id="profFullName" class="input-field" placeholder="Full legal name">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Roll Number / Enrolment ID:</label>
+                    <input type="text" id="profRollNumber" class="input-field" placeholder="e.g. 2026/CS/1042">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Father's Name:</label>
+                    <input type="text" id="profFatherName" class="input-field" placeholder="Father's name">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Mother's Name:</label>
+                    <input type="text" id="profMotherName" class="input-field" placeholder="Mother's name">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Date of Birth (YYYY-MM-DD):</label>
+                    <input type="date" id="profDob" class="input-field">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Category / Quota:</label>
+                    <select id="profCategory" class="input-field">
+                      <option value="General">General</option>
+                      <option value="OBC">OBC (Non-Creamy)</option>
+                      <option value="SC">SC</option>
+                      <option value="ST">ST</option>
+                      <option value="EWS">EWS</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">College / Institute Name:</label>
+                    <input type="text" id="profCollege" class="input-field" placeholder="College name">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Department / Branch:</label>
+                    <input type="text" id="profBranch" class="input-field" placeholder="e.g. Computer Science">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Academic Year / Semester:</label>
+                    <input type="text" id="profAcademicYear" class="input-field" placeholder="e.g. 2025-2026, 3rd Year">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Mobile Number:</label>
+                    <input type="tel" id="profPhone" class="input-field" placeholder="+91 98765 43210">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Village / Town:</label>
+                    <input type="text" id="profVillage" class="input-field" placeholder="Village / Locality">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">District:</label>
+                    <input type="text" id="profDistrict" class="input-field" placeholder="District">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">State:</label>
+                    <input type="text" id="profState" class="input-field" placeholder="State">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Pin Code:</label>
+                    <input type="text" id="profPinCode" class="input-field" placeholder="e.g. 221001">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Annual Family Income (₹):</label>
+                    <input type="text" id="profIncome" class="input-field" placeholder="e.g. 180000">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Aadhaar (Last 4 digits):</label>
+                    <input type="text" id="profAadhar" class="input-field" maxlength="4" placeholder="e.g. 5432">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Bank Account Number:</label>
+                    <input type="text" id="profBankAccount" class="input-field" placeholder="Account Number">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Bank IFSC Code:</label>
+                    <input type="text" id="profIfsc" class="input-field" placeholder="e.g. SBIN0001234">
+                  </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                  <button type="submit" class="ctrl-btn primary" id="saveProfileBtn">
+                    <i data-lucide="save"></i> Save Profile Details
+                  </button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+      <div class="mobile-nav-item active" data-tab="tab-teacher">
+        <i data-lucide="graduation-cap"></i>
+        <span>Teacher</span>
+      </div>
+      <div class="mobile-nav-item" data-tab="tab-forms">
+        <i data-lucide="file-check-2"></i>
+        <span>Forms</span>
+      </div>
+      <div class="mobile-nav-item" data-tab="tab-documents">
+        <i data-lucide="scan"></i>
+        <span>Docs</span>
+      </div>
+      <div class="mobile-nav-item" data-tab="tab-quiz">
+        <i data-lucide="help-circle"></i>
+        <span>Quiz</span>
+      </div>
+      <div class="mobile-nav-item" data-tab="tab-graph">
+        <i data-lucide="line-chart"></i>
+        <span>Graph</span>
+      </div>
+      <div class="mobile-nav-item" data-tab="tab-profile">
+        <i data-lucide="user"></i>
+        <span>Profile</span>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Auth Modal (Login / Register / Try Demo Student) -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div class="brand-icon" style="margin: 0 auto 0.75rem; width: 48px; height: 48px;">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <h2 style="font-size: 1.3rem; font-weight: 800;">Welcome to TECH AI | Smart Way</h2>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">Sign in to sync your study notes, forms, and progress.</p>
+      </div>
+
+      <!-- Quick Demo Student Login Button -->
+      <div style="margin-bottom: 1.25rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 1rem; text-align: center;">
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.6rem;">Instant 1-Click Access for Evaluators:</p>
+        <button class="ctrl-btn primary" id="demoLoginBtn" style="width: 100%; justify-content: center;">
+          <i data-lucide="zap"></i> Sign In as Demo Student (Aarav Sharma)
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; margin: 1rem 0; color: var(--text-muted); font-size: 0.75rem;">
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        <span style="padding: 0 0.75rem;">OR ENTER CREDENTIALS</span>
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+      </div>
+
+      <form id="authForm">
+        <div class="input-group" id="fullNameGroup" style="display: none;">
+          <label class="input-label">Full Name:</label>
+          <input type="text" id="authFullName" class="input-field" placeholder="Aarav Sharma">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Email Address:</label>
+          <input type="email" id="authEmail" class="input-field" placeholder="student@smartway.ai" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Password:</label>
+          <input type="password" id="authPassword" class="input-field" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="ctrl-btn primary" id="authSubmitBtn" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+        <span id="authTogglePrompt">Don't have an account?</span>
+        <a href="#" id="authToggleLink" style="color: var(--accent-cyan); font-weight: 600; margin-left: 0.25rem;">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Capture Modal -->
+  <div class="modal-overlay" id="cameraModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700;"><i data-lucide="camera"></i> Device Camera Capture</h3>
+        <button class="icon-btn" id="closeCameraModalBtn"><i data-lucide="x"></i></button>
+      </div>
+      <div style="width: 100%; height: 320px; background: #000; border-radius: var(--radius-md); overflow: hidden; position: relative;">
+        <video id="cameraVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+      </div>
+      <div style="display: flex; justify-content: center; margin-top: 1rem;">
+        <button class="ctrl-btn primary" id="snapPhotoBtn">
+          <i data-lucide="aperture"></i> Capture Document
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Application Modules Scripts -->
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/modules/teacher.js"></script>
+  <script src="/static/js/modules/form_filler.js"></script>
+  <script src="/static/js/modules/doc_processor.js"></script>
+  <script src="/static/js/modules/quiz.js"></script>
+  <script src="/static/js/modules/grapher.js"></script>
+  <script src="/static/js/modules/profile.js"></script>
+
+  <script>
+    // Initialize Lucide icons on load
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
